@@ -29,6 +29,23 @@ local randomOperator
 local wrongObject
 local pointsTextObject
 local numberPoints = 0
+local correctSound
+local correctSoundChannel 
+local WrongSound
+local WrongSoundChannel 
+
+-------------------------------------------------------------------------------------------------
+-- SOUNDS
+------------------------------------------------------------------------------------------------------
+
+-- Correct Sound 
+local correctSound = audio.loadSound ("Sounds/correctSound.mp3" ) -- setting a variable to an mp3 file
+local correctSoundChannel
+
+-- Wrong Sound 
+local wrongSound = audio.loadSound ( "Sounds/wrongSound.mp3") -- setting a variable to an mp3 file
+local wrongSoundChannel
+
 
 
 ------------------------------------------------------------------------------------------------------------
@@ -37,7 +54,7 @@ local numberPoints = 0
  
 local function AskQuestion()
 	-- generate 2 random numbers between a max. and a min. number
-	randomOperator = math.random(0,3)
+	randomOperator = math.random(1,3)
 	randomNumber1 = math.random(1,10)
 	randomNumber2 = math.random(1,10)
 
@@ -68,6 +85,10 @@ local function HideCorrect()
 	AskQuestion()
 end
 
+local function HideInCorrect()
+IncorrectObject.isVisible = false
+	AskQuestion()
+end
 
 local function NumericFieldListener( event ) 
 
@@ -86,10 +107,10 @@ local function NumericFieldListener( event )
 		if (userAnswer == correctAnswer) then
 			correctObject.isVisible = true 
 			event.target.text = ""
-			incorrectObject.isVisible = false
+			correctObject.isVisible = false
+			correctSoundChannel = audio.play(correctSound)
 			timer.performWithDelay(2000,HideCorrect)
 			numberPoints = numberPoints + 1
-
 			event.target.text = "" 
 
        -- add additional amount of points for every answer you did right in the text object
@@ -98,9 +119,10 @@ local function NumericFieldListener( event )
 		else 
 			correctObject.isVisible = false 
 			incorrectObject.isVisible = true
+			wrongSoundChannel = audio.play(wrongSound)
 			timer.performWithDelay(2000,HideinCorrect)
-			numberPoints = numberPoints - 1
-
+			
+			
 	     
 
          end        
@@ -134,7 +156,7 @@ incorrectObject.isVisible = false
 
 -- Create numeric field 
 numericField = native.newTextField( display.contentWidth/2, display.contentHeight/2, 150, 80 )
-numericField.inputType = "number"
+numericField.inputType = "default"
 
 
 -- add the event listener for the points and  numeric Field 
