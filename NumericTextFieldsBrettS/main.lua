@@ -36,12 +36,14 @@ local correctSoundChannel
 local incorrectSound
 local incorrectSoundChannel 
 local numberLives = 4
+local numberClock = 5
 
 -- variables for the timer 
 local totalSeconds = 5
 local secondsLeft = 5
 local clockText
 local countDownTimer
+local DecreaseHearts
 
 local lives = 4
 local heart1
@@ -67,6 +69,22 @@ local incorrectSoundChannel
 -- LOCAL FUNCTIONS
 -----------------------------------------------------------------------------------------------------------
 
+local function DecreaseHearts()	    
+		    
+	-- show hearts decrease
+	if (lives == 4) then 
+		heart4.isVisible = false 
+	elseif (lives == 3) then 
+		heart3.isVisible = false
+	elseif (lives == 2) then
+		heart2.isVisble = false
+	elseif(lives == 1) then
+		heart1.isVisible = false
+	end
+end
+
+
+
 local function UpdateTime()
 	-- decrement the number of seconds 
 	secondsLeft = secondsLeft - 1
@@ -80,16 +98,7 @@ local function UpdateTime()
 
 		-- *** IF THERE ARE NO LIVES LEFT, PLAY A LOSE SOUND, SHOW A YOU LOSE IMAGE 
 		-- AND CANCEL THE TIMER REMOVE THE THIRD HEART BY MAKING IT INVISIBLE 
-		if (lives == 4) then 
-			heart4.isVisible = false 
-		elseif (lives == 3) then 
-			heart3.isVisible = false
-		elseif (lives == 2) then
-			heart2.isVisble = false
-		elseif(lives == 1) then
-			heart1.isVisible = false
-	    end
-
+		DecreaseHearts()
 
 	    -- *** CALL THE FUNCTION TO ASK A NEW QUESTION
     
@@ -99,11 +108,10 @@ end
 
 -- function that calls the timer
  local function StartTimer()
- 	-- create a countdown timer that loops infinitely
+ 	-- Creates the countdownTimer object that calls UpdateTime every second indefinitely
+ 	countDownTimer = timer.performWithDelay( 1000, UpdateTime, 0)
+
 end
- 	countDownTimer = timer.performWithDelay( 1000, updateTime, 0)
-
-
  
 local function AskQuestion()
 	-- generate 2 random numbers between a max. and a min. number
@@ -153,7 +161,7 @@ local function NumericFieldListener( event )
 		-- clear text field 
 		event.target.text = "" 
 
-	elseif event.phase == "submitted" then
+	elseif (event.phase == "submitted") then
 
 		-- when the answer is submitted (enter key is pressed) set user input bto user's answer
 		userAnswer = tonumber(event.target.text)
@@ -174,16 +182,28 @@ local function NumericFieldListener( event )
 			--remove 1 point for every answer the user gets wron in the text object
              livesTextObject.text = "Lives = "  .. numberLives
 
+             -- remove the seconds by 1 each time.
+             ClockTextObject.text = "Clock = " .. numberClock
+        -- They got the question wrong
 		else 
+			-- This makes the correct object invisible
 			correctObject.isVisible = false 
+			--  This makes the incorrect object visible
 			incorrectObject.isVisible = true
+			-- This plays the incoreeect music when the user gets the incorrect answer.
 		    incorrectSoundChannel = audio.play(incorrectSound)
+		    -- This displays the incorrect object for 2 seconds, then disapeares.
 			timer.performWithDelay(2000,HideinCorrect)
-		    lives = lives - 1
-
-		end    
-    end
+			-- User loses a live
+			lives = lives - 1
+			--  User loses a heart for each answer they got wrong
+			DecreaseHearts()
+		end
+	end
+	
 end 
+
+
 
     
 
@@ -213,6 +233,12 @@ gameOver = display.newImageRect(" Images/gameOver.png", 200, 200)
 -- create a points box and make the point box visible to see.
 pointsTextObject = display.newText("numberPoints = ".. numberPoints, 330, 200, nil, 40 )
 pointsTextObject:setTextColor(3/255, 3/255, 43/255) 
+
+
+-- create clockText box and make the ClockText box visible to see
+ClockTextObject = display.newText("numberClock = ".. numberClock, 600, 400, nil, 40 )
+ClockTextObject:setTextColor(3/255, 3/255, 43/255) 
+
 
 --create a lives box and make the lives box visible to see
 livesTextObject = display.newText("numberLives = ".. numberLives, 500, 700, nil, 40 )
@@ -250,11 +276,6 @@ numericField:addEventListener( "userInput", NumericFieldListener )
 
 -- call the function to ask the question
 AskQuestion()
-
-NumericFieldListener()
-
-UpdateTime()
-
-StarTime()
+StartTimer()
 
 
