@@ -93,16 +93,18 @@ local function UpdateHearts()
 end
 -------------------------------------------------------------
 local function UpdateTime()
- -- decrement the number of sounds left
+ -- decrement the number of seconds left
  secondsLeft = secondsLeft - 1
- --display the number of seconds left in the
+ 
  --clock object
  clockText.text = secondsLeft .. ""
+ 
  if (secondsLeft == 0 ) then
   --reset the  number of seconds left 
   secondsLeft = totalSeconds
   -- restart the game when all lives are lost.
   lives = lives - 1
+
 
   --***IF THERE ARE NO LIVES LEFT, PLAY A LOSE SOUND,
   --SHOW A "YOU LOSE IMAGE AND CANCEL THE TIMER, REMOVE
@@ -120,28 +122,34 @@ end
 
 -- local functions 
 local function AskQuestion()
- --generate 2 random numbers between a max. and a min. number
- randomOperator = math.random(1,3)
- randomNumber1 = math.random(10,20)
- randomNumber2 = math.random(10,20)
+ 	--generate 2 random numbers between a max. and a min. number
+ 	randomOperator = math.random(1,3)
+ 	randomNumber1 = math.random(10,20)
+ 	randomNumber2 = math.random(10,20)
  
-  if (randomOperator == 1) then
-   correctAnswer = randomNumber1 + randomNumber2
+  	if (randomOperator == 1) then
+  		-- Creates the sum of the answer with addition.
+   		correctAnswer = randomNumber1 + randomNumber2
  
-  --create question in text object
- questionObject.text = randomNumber1 .. " + " .. randomNumber2 .. " = "
+  		-- Displays the the question on the screen with addiion.
+ 		questionObject.text = randomNumber1 .. " + " .. randomNumber2 .. " = "
  
- elseif (randomOperator == 2) then
-   correctAnswer = randomNumber1 - randomNumber2
-  
-  -- create question in text object
-  questionObject.text = randomNumber1 .. " * " .. randomNumber2 .. " = "
+ 	elseif (randomOperator == 2) then
+ 		-- Creates the diference of the answer with subtraction.
+  		correctAnswer = randomNumber1 - randomNumber2
+  		
+  		-- Displays the the question on th screen with subtraction.
+ 		questionObject.text = randomNumber1 .. " - " .. randomNumber2 .. " = "
  
- elseif (randomOperator == 3) then
-   correctAnswer = randomNumber1 * randomNumber2
-  --create question in text object
-  questionObject.text = randomNumber1 .. " - " .. randomNumber2 .. " = "
- end 
+ 		
+ 		 
+  	elseif (randomOperator == 3) then
+ 		-- Creates the product of the answer with multiplication
+   		correctAnswer = randomNumber1 * randomNumber2
+  		
+  		-- Displays the the question on th screen with Multiplication
+  		questionObject.text = randomNumber1 .. " * " .. randomNumber2 .. " = "
+ 	end 
 end
 
 
@@ -157,42 +165,73 @@ end
 
 local function NumericFieldListener( event )
  
- --User begins editing "numericFeild"
- if ( event.phase == "began" ) then
+	--User begins editing "numericFeild"
+	if ( event.phase == "began" ) then
  
-  --clear text field 
-  event.target.text = ""
+		--clear text field 
+  		event.target.text = ""
  
- elseif event.phase == "submitted" then
-  -- when the answer is submitted (enter key is pressed) set user input bto user's answer
- 
-  userAnswer = tonumber(event.target.text)
+ 	elseif (event.phase == "submitted") then
+  		-- when the answer is submitted (enter key is pressed) set user input bto user's answer
+  		userAnswer = tonumber(event.target.text)
   
-    -- if the user's answer and the correct answer and the correct answer are the same:
    
-  if  (userAnswer == correctAnswer) then
-    correctObject.isVisible = true 
-    correctSoundChannel = audio.play(correctSound)
-    incorrectObject.isVisible = false
-    timer.performWithDelay(2000,HideCorrect)
-    numberOfPoints = numberOfPoints + 1
-    event.target.text = ""
-        
+    	-- if the user's answer and the correct answer and the correct answer are the same:
+  		if  (userAnswer == correctAnswer) then
+  	
+  			-- the correct object is visible 
+    		correctObject.isVisible = true 
+   
+   			-- Plays the correct sound 
+    		correctSoundChannel = audio.play(correctSound)
+    
+    		-- since answer is correct, the incorrect object becomes invisible.
+     		incorrectObject.isVisible = false
 
-    -- create increasing points in the text object
-    pointsTextObject.text = "Points = ".. numberOfPoints
+     		-- this calls hide correct after two seconds
+    		timer.performWithDelay(2000,HideCorrect)
+   
+   		 	-- This increases the points by one for each answer we get right.
+    		numberOfPoints = numberOfPoints + 1
 
--- if useranswer and adn the correct answer are not the s
-elseif (userAnswer ~= IncorrectAnswer) then
-    incorrectObject.isVisible = true
-    wrongSoundChannel = audio.play(wrongSound)
-    lives = lives - 1
-    UpdateHearts()
-    incorrectObject.isVisible = true
-    timer.performWithDelay(2000,HideIncorrect)
-    event.target.text = ""   
-  end
- end
+    		-- Displays the points
+    		pointsTextObject.text = "Points = ".. numberOfPoints
+    
+    		-- Clears the text field 
+    		event.target.text = ""
+
+    		-- reset the number of seconds back to the total amount of seconds  
+    		secondsLeft = totalSeconds
+
+
+		else
+
+			-- The incorrect object becomes visible
+			incorrectObject.isVisible = true
+    
+    		-- Plays the incorrect sound
+    		wrongSoundChannel = audio.play(wrongSound)
+    
+    		-- Decreases the amount of hearts for each answer the user gets wrong
+    		UpdateHearts()
+    
+   		 	-- since answer is Incorrect, the correct object becomes invisible.
+    		correctObject.isVisible = false
+
+    		-- Removes one heart for each question answered incorrectly
+   		 	lives = lives - 1
+    
+   			-- this calls HideIncorrect after two seconds
+    		timer.performWithDelay(2000,HideIncorrect)
+    
+    		-- Clears the text field
+   	 		event.target.text = "" 
+
+   			 -- reset the number of seconds back to the total amount of seconds 
+    		secondsLeft = totalSeconds
+  
+  		end
+ 	end
 end
 ------------------------------------------------------------
 -- OBJECTS CREATION
@@ -216,7 +255,7 @@ clockText = display.newText(secondsLeft, 520, 680, nil, 190)
 clockText:setFillColor( 144/255, 234/255, 86/255 )
 
  
---create and display game over on the screen
+-- create and display game over on the screen
 gameOver = display.newImageRect("Images/gameOver.png", display.contentWidth, display.contentHeight)
 gameOver.anchorX = 0
 gameOver.anchorY = 0
@@ -233,12 +272,12 @@ questionObject = display.newText("", display.contentWidth/3, display.contentHeig
 questionObject:setTextColor(56/255, 234/255, 100/255)
 
 -- create the correct text object and make it invisible
- correctObject = display.newText("Correct MY Guy", display.contentWidth/2, display.contentHeight/2, 250, 60)
-correctObject:setTextColor(34/255, 56/255, 226/255)
+correctObject = display.newText("Correct", display.contentWidth/2,  250, nil, 50)
+correctObject:setTextColor(135/255, 34/255, 195/255)
 correctObject.isVisible = false
 
 -- create the incorrect text object and make it invisible
-incorrectObject = display.newText("Incorrect My Guy", display.contentWidth/2, 250, nil, 50)
+incorrectObject = display.newText("Incorrect", display.contentWidth/2, 250, nil, 50)
 incorrectObject:setTextColor(135/255, 34/255, 195/255)
 incorrectObject.isVisible = false
 -----------------------------------------------------------
@@ -246,6 +285,8 @@ incorrectObject.isVisible = false
 ------------------------------------------------------------
 numericField = native.newTextField(display.contentWidth/3, display.contentHeight*2/3, 150, 150)
 numericField.inputType = "default"
+
+
 --add the event listener fo the numeric field
 numericField:addEventListener( "userInput", NumericFieldListener)
 ---------------------------------------------------------
