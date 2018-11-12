@@ -37,7 +37,7 @@ local randomOperator
 local wrongAnswer
 local correctAnswer
 local pointsTextObject
-local numberOfPoints = 0
+local numberPoints = 0
 
 --------------------------------------------------------
 -- SOUNDS
@@ -192,10 +192,10 @@ local function NumericFieldListener( event )
     		timer.performWithDelay(2000,HideCorrect)
    
    		 	-- This increases the points by one for each answer we get right.
-    		numberOfPoints = numberOfPoints + 1
+    		numberPoints = numberPoints + 1
 
     		-- Displays the points
-    		pointsTextObject.text = "Points = ".. numberOfPoints
+    		pointsTextObject.text = "Points = ".. numberPoints
     
     		-- Clears the text field 
     		event.target.text = ""
@@ -263,8 +263,9 @@ gameOver.isVisible = false
 
 
 
+
 -- create points box and make it visible
-pointsTextObject = display.newText( "Points = ".. numberOfPoints, 800, 385, nil, 50 )
+pointsTextObject = display.newText( "Points = ".. numberPoints, 800, 385, nil, 50 )
 pointsTextObject:setTextColor(24/255, 119/255, 25/255)
 
 -- display a question and sets the color 
